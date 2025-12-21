@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { User } from "../models/user.model.js";
 
- const registerUser = async (req: Request, res: Response) => {
+const registerUser = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
 
@@ -80,5 +80,4 @@ const generateToken = (id: string) => {
   });
 };
 
-
-export {registerUser,loginUser}
+export { registerUser, loginUser };
