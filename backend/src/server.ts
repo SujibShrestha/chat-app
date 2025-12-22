@@ -1,4 +1,4 @@
-import { createServer } from "node:http";
+
 import express, {
   type Application,
   type Request,
@@ -7,20 +7,22 @@ import express, {
 import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
-import { Server } from "socket.io";
+import setupSocket from "./socket.js";
 import authRoute from "./routes/auth.route.js";
 import userRoute from "./routes/user.route.js";
+import http from "http";
 
 dotenv.config();
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
-const io = new Server();
+const server = http.createServer(app)
 connectDB();
 
 //Middleware
 app.use(express.json());
 app.use(cors());
+setupSocket(server)
 
 //Routes
 app.use("/api/auth", authRoute);
@@ -30,10 +32,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Api is running...");
 });
 
-io.on("connection", (socket) => {
-  console.log("a user is connected");
-});
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on PORT : ${PORT}`);
 });
