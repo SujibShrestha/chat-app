@@ -3,9 +3,9 @@ import type { IChat } from "./chat.model.js";
 import type { IUser } from "./user.model.js";
 
 interface IMessage {
-  sender: IUser;
+  sender: IUser | mongoose.Types.ObjectId;
   content: string;
-  chat: IChat;
+  chat: IChat | mongoose.Types.ObjectId ;
 }
 
 const messageSchema = new Schema<IMessage>(

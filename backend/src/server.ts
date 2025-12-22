@@ -10,6 +10,8 @@ import connectDB from "./config/db.js";
 import setupSocket from "./socket.js";
 import authRoute from "./routes/auth.route.js";
 import userRoute from "./routes/user.route.js";
+import messageRoute from "./routes/message.route.js"
+import chatRoute from "./routes/chat.route.js"
 import http from "http";
 
 dotenv.config();
@@ -27,6 +29,9 @@ setupSocket(server)
 //Routes
 app.use("/api/auth", authRoute);
 app.use("/api/users",userRoute);
+app.use("/api/chat",chatRoute);
+app.use("/api/message",messageRoute);
+
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Api is running...");
