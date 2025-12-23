@@ -1,5 +1,4 @@
 
-import Sidebar from '../components/Sidebar/Sidebar'
 import Chatpage from '../components/Chat/Chatpage'
 
 const Chat = () => {
@@ -11,7 +10,7 @@ const Chat = () => {
     </nav>
 
     <div className='flex items-center '>
-      <Sidebar/>
+      
       <Chatpage/>
     </div>
     </div>

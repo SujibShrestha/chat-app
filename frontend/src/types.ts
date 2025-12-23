@@ -1,10 +1,12 @@
 export interface IUser {
-  name: string;
+    _id: string;
+    name: string;
   email: string;
   token: string;
 }
 
 export interface IChat {
+  _id: string;
   chatName?: string;
   isGroupChat: boolean;
   users: IUser[];
