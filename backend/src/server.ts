@@ -18,8 +18,8 @@ dotenv.config();
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
-const server = http.createServer(app)
 connectDB();
+const server = http.createServer(app)
 
 //Middleware
 app.use(express.json());
