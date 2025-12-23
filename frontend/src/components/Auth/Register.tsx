@@ -3,7 +3,8 @@
     import * as z from "zod";
     import { registerUser } from "../../api/api"; 
     import { toast } from "sonner";
-    import { useEffect } from "react";
+    import { useContext, useEffect } from "react";
+import { AuthContext } from "../../context/AuthContext";
 
     // Zod schema for register
     const formSchema = z.object({
@@ -19,6 +20,7 @@
     type RegisterForm = z.infer<typeof formSchema>;
 
     export function Register() {
+        const {setUser} = useContext(AuthContext)
     const {
         register,
         handleSubmit,
@@ -34,6 +36,7 @@
             email: data.email,
             password: data.password,
         });
+        setUser(response.data)
            toast.success("User registered")
 
         } catch (error) {

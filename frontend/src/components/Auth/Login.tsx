@@ -3,6 +3,9 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { LoginUser } from "../../api/api";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -12,7 +15,9 @@ const formSchema = z.object({
 type LoginForm = z.infer<typeof formSchema>;
 
 export function Login() {
-  const {
+  const {setUser} = useContext(AuthContext)
+  const navigate = useNavigate()
+  const { 
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
@@ -22,8 +27,10 @@ export function Login() {
 
   async function onSubmit(data: LoginForm) {
     try {
-      await LoginUser(data);
+      const response = await LoginUser(data);
+      setUser(response.data)
      toast.success("Login successfull")
+     navigate('/');
     } catch (error) {
       console.error(error);
     }
