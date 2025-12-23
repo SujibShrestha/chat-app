@@ -39,4 +39,10 @@ const createChat = (token: string, userId: string) => {
   );
 };
 
+export const fetchMessages = (token: string, chatId: string) => {
+  return API.get(`/message/${chatId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
 export { registerUser, LoginUser, fetchChat, sendMessage, createChat };

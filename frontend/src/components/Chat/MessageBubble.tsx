@@ -1,113 +1,115 @@
-import { sendMessage, fetchChat } from "../../api/api";
+import { sendMessage, fetchMessages } from "../../api/api";
 import { AuthContext } from "../../context/AuthContext";
 import type { IMessage, IChat } from "@/types";
 import { useState, useEffect, useContext, useRef } from "react";
+import { Spinner } from "../ui/spinner";
 
 const MessageBubble = ({ chat }: { chat: IChat | null }) => {
   const { user } = useContext(AuthContext);
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [loading, setLoading] = useState(false);
-  const [newMessage, setNewMessage] = useState("");
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const [newMessage, setNewMessage] = useState<string>("");
 
-  // Scroll to bottom whenever messages change
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  // Ref to scroll to bottom
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Load messages when chat or user changes
+  // Load messages when chat changes
   useEffect(() => {
-    if (!user || !chat?._id) return;
+    if (!user || !chat) return;
 
     const loadMessages = async () => {
       setLoading(true);
       try {
-        const res = await fetchChat( user.token); // Pass chatId
-        setMessages(res.data ?? []);
-      } catch (err) {
-        console.error(err);
+        const res = await fetchMessages(user.token, chat._id);
+        setMessages(res.data);
       } finally {
         setLoading(false);
+        // scroll to bottom after messages load
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
       }
     };
 
     loadMessages();
   }, [chat, user]);
 
-  // Send a new message
+  // Scroll to bottom whenever messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   const handleSend = async () => {
-    if (!newMessage.trim() || !user || !chat?._id) return;
+    if (!newMessage.trim() || !user || !chat) return;
 
-    try {
-      const res = await sendMessage(user.token, {
-        content: newMessage,
-        chatId: chat._id,
-      });
+    const res = await sendMessage(user.token, {
+      content: newMessage,
+      chatId: chat._id,
+    });
 
-      if (res?.data) {
-        setMessages((prev) => [...prev, res.data]);
-        setNewMessage("");
-      }
-    } catch (err) {
-      console.error(err);
-    }
+    setMessages((prev) => [...prev, res.data]);
+    setNewMessage("");
   };
 
   if (!chat) {
     return (
-      <div className="flex items-center justify-center text-gray-500 h-full ml-[20vw]">
+      <div className="flex items-center justify-center w-[80vw] text-gray-500 h-full">
         Select a chat to start messaging
       </div>
     );
   }
 
   return (
-    <section className="ml-[20vw] flex flex-col h-[calc(100vh-2rem)] p-4">
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto mb-4">
-        {loading && <p className="text-sm text-gray-400">Loading...</p>}
-        {messages.map((msg: IMessage,index) => (
+    <section className="my-4 p-4 w-full h-full flex flex-col">
+      {/* Messages container */}
+      <div className="flex-1 overflow-y-auto w-full">
+        {loading && (
+          <div className="flex justify-center items-center h-full">
+            <Spinner className="w-7 h-7" />
+          </div>
+        )}
+
+        {messages.map((msg) => (
           <div
-            key={index}
-            className={`flex mb-2 ${
-              msg.sender?._id === user?._id ? "justify-end" : "justify-start"
+            key={msg._id}
+            className={`chat ${
+              msg.sender?._id === user?._id ? "chat-end" : "chat-start"
             }`}
           >
+            <div className="chat-header flex justify-between gap-2">
+              {msg.sender?.name}
+              <time className="text-xs opacity-50">
+                {new Date(msg.updatedAt).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </time>
+            </div>
             <div
-              className={`max-w-[70%] px-4 py-2 rounded-xl ${
+              className={`chat-bubble ${
                 msg.sender?._id === user?._id
-                  ? "bg-indigo-500 text-white rounded-br-none"
-                  : "bg-gray-200 text-gray-900 rounded-bl-none"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-black"
               }`}
             >
-              <div className="text-sm font-semibold mb-1">
-                {msg.sender?.name ?? "Unknown"}
-              </div>
-              <div className="text-sm">{msg.content}</div>
-              <div className="text-xs text-gray-400 mt-1 text-right">
-                {msg.updatedAt
-                  ? new Date(msg.updatedAt).toLocaleTimeString()
-                  : ""}
-              </div>
+              {msg.content}
             </div>
           </div>
         ))}
-        <div ref={messagesEndRef}></div>
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Input */}
-      <div className="flex gap-2">
+      <div className="flex justify-center items-center gap-2 mt-5">
         <input
           type="text"
           placeholder="Type a message..."
+          className="w-full p-2 border border-gray-500 outline-none rounded-lg"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          className="flex-1 p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
         />
         <button
           onClick={handleSend}
-          className="bg-green-500 hover:bg-green-600 text-white px-5 py-3 rounded-xl font-semibold transition"
+          className="bg-green-500 hover:bg-green-800 cursor-pointer px-4 py-2 rounded-lg"
         >
           Send
         </button>

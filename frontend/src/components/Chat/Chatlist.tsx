@@ -3,6 +3,9 @@ import { createChat, fetchChat } from "../../api/api";
 import { AuthContext } from "../../context/AuthContext";
 import type { IChat } from "../../types";
 import type { AxiosResponse } from "axios";
+import { useDebounce } from "use-debounce";
+
+import { Spinner } from "../ui/spinner";
 
 const ChatList = ({
   onselectChat,
@@ -11,37 +14,53 @@ const ChatList = ({
 }) => {
   const { user } = useContext(AuthContext);
   const [chats, setChats] = useState<IChat[]>([]);
-  const [search,setSearch] = useState("");
-
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [debouncevalue] = useDebounce(search, 8000);
+console.log(debouncevalue)
   useEffect(() => {
     if (!user) return;
-    fetchChat(user.token).then((res: AxiosResponse) => setChats(res.data));
+   const loadChats = async () => {
+      setLoading(true);
+      try {
+        const res: AxiosResponse = await fetchChat(user.token);
+        setChats(res.data);
+      } catch (err) {
+        console.error("Failed to fetch chats:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadChats();
+  }, [user]);
+
+  const handleCreateChat = async () => {
+    if (!debouncevalue || !user) return;
+
+    const res = await createChat(user.token, debouncevalue);
+    setChats((prev) => [res.data, ...prev]);
+    onselectChat(res.data);
+    setSearch("");
+  };
+
+  return (
 
     
 
-  }, [user]);
-
-  const handleCreateChat =  async()=>{
-    if(!search || !user) return;
-    const timer =  setTimeout(async()=>{
-    const res = await createChat(user.token,search);
-    setChats((prev)=>[res.data,...prev]);
-    onselectChat(res.data);
-    setSearch("")
-  },1000)
-return () => clearTimeout(timer);
-}
-
-  return (
-    <aside className="w-[20vw] border-r p-4 space-y-2">
-         <div className="flex gap-1 flex-nowrap mb-4">
+    <aside className="w-[20vw] min-h-[80%] border-r p-4 space-y-2">
+     { loading?(<div className="flex justify-center h-full items-center"><Spinner className="w-7 h-7"/></div>):( <div>
+      <div className="flex gap-1 flex-nowrap mb-4">
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Enter user ID"
           className=""
         />
-        <button onClick={handleCreateChat} className="bg-green-500 hover:bg-green-800 py-2 px-3 rounded-lg">
+        <button
+          onClick={handleCreateChat}
+          className="bg-green-500 hover:bg-green-800 py-2 px-3 rounded-lg"
+        >
           New
         </button>
       </div>
@@ -51,12 +70,12 @@ return () => clearTimeout(timer);
           onClick={() => onselectChat(chat)}
           className="cursor-pointer p-3 rounded-lg hover:bg-gray-200"
         >
-          {
-         
-          chat.isGroupChat ? chat.chatName : "Direct Chat"}
+          {chat.isGroupChat ? chat.chatName : "Direct Chat"}
         </div>
       ))}
+   </div> )}
     </aside>
+  
   );
 };
 
