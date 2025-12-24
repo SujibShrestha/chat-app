@@ -3,6 +3,7 @@ import { AuthContext } from "../../context/AuthContext";
 import type { IMessage, IChat } from "@/types";
 import { useState, useEffect, useContext, useRef } from "react";
 import { Spinner } from "../ui/spinner";
+import socket from "../../socket";
 
 const MessageBubble = ({ chat }: { chat: IChat | null }) => {
   const { user } = useContext(AuthContext);
@@ -37,6 +38,22 @@ const MessageBubble = ({ chat }: { chat: IChat | null }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  useEffect(() => {
+  if (!chat) return;
+
+  socket.emit("join-chat", chat._id);
+
+ const handleMessageReceived = (newMsg:IMessage) => {
+    if (newMsg.chat._id === chat._id) {
+      setMessages((prev) => [...prev, newMsg]);
+    }
+  };
+socket.on("message-received", handleMessageReceived);
+  return () => {
+    socket.off("message-received",handleMessageReceived);
+  };
+}, [chat]);
+
   const handleSend = async () => {
     if (!newMessage.trim() || !user || !chat) return;
 
@@ -44,7 +61,7 @@ const MessageBubble = ({ chat }: { chat: IChat | null }) => {
       content: newMessage,
       chatId: chat._id,
     });
-
+ socket.emit("new-message", res.data);
     setMessages((prev) => [...prev, res.data]);
     setNewMessage("");
   };
@@ -67,9 +84,9 @@ const MessageBubble = ({ chat }: { chat: IChat | null }) => {
           </div>
         )}
 
-        {messages.map((msg) => (
+        {messages.map((msg,index) => (
           <div
-            key={msg._id}
+            key={index}
             className={`chat ${
               msg.sender?._id === user?._id ? "chat-end" : "chat-start"
             }`}

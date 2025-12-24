@@ -4,7 +4,6 @@ const API = axios.create({
   baseURL: `${import.meta.env.VITE_API_PORT}/api`,
 });
 
-console.log(`${import.meta.env.VITE_API_PORT}/api`);
 
 const registerUser = (data: {
   name: string;

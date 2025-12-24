@@ -17,7 +17,6 @@ const ChatList = ({
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
   const [debouncevalue] = useDebounce(search, 8000);
-console.log(debouncevalue)
   useEffect(() => {
     if (!user) return;
    const loadChats = async () => {

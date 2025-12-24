@@ -3,6 +3,7 @@ import { Chat } from "../models/chat.model.js";
 import type { Request, Response } from "express";
 import type { AuthRequest } from "../middlewares/auth.middleware.js";
 import mongoose from "mongoose";
+import {io} from "../socket.js";
 
 const sendMessage = async(req:AuthRequest,res:Response)=>{
     const {content,chatId} = req.body 
@@ -27,6 +28,7 @@ const sendMessage = async(req:AuthRequest,res:Response)=>{
      const fullMessage = await Message.findById(message._id)
      .populate("sender","name email")
      .populate("chat");
+ io.to(chatId.toString()).emit("message-received", fullMessage);
 
      return res.status(200).json(fullMessage)
 }

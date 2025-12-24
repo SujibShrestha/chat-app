@@ -7,7 +7,7 @@ import express, {
 import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
-import setupSocket from "./socket.js";
+import {setupSocket} from "./socket.js";
 import authRoute from "./routes/auth.route.js";
 import userRoute from "./routes/user.route.js";
 import messageRoute from "./routes/message.route.js"

@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState, type ReactNode } from "react";
 
 import type { IUser } from "../types";
+import socket from "../socket";
 
 interface AuthContextProps {
   user: IUser | null;
@@ -20,6 +21,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (user) {
       localStorage.setItem("user", JSON.stringify(user));
+       socket.emit("setup", user._id);
     } else {
       localStorage.removeItem("user");
     }

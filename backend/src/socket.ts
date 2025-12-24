@@ -1,9 +1,10 @@
 import { Server } from "socket.io";
 import http from "http";
-import type { IUser } from "./models/user.model.js";
+
+let io: Server;
 
 const setupSocket = (server: http.Server) => {
-  const io = new Server(server, {
+  io = new Server(server, {
     cors: {
       origin: "*",
       credentials: true,
@@ -11,28 +12,25 @@ const setupSocket = (server: http.Server) => {
   });
 
   io.on("connection", (socket) => {
-    console.log("User connected", socket.id);
+    console.log("User connected:", socket.id);
 
-    socket.on("setup", (userId: string) => {
-      socket.join(userId);
-      socket.emit("connected");
-    });
-
-    socket.on("join chat", (chatId: string) => {
+    socket.on("join-chat", (chatId: string) => {
       socket.join(chatId);
+      console.log("Joined chat:", chatId);
     });
 
-    socket.on("new message", (message) => {
-      const chat = message.chat;
+    socket.on("new-message", (message) => {
+      const chatId = message.chat._id || message.chat;
 
-      if (!chat.users) return;
-      chat.user.foreach((user: IUser) => {
-        if (user._id === message.sender._id) return;
+      console.log("Emitting to chat:", chatId);
 
-        socket.to(user._id.toString()).emit("message received", message);
-      });
+      socket.to(chatId).emit("message-received", message);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("User disconnected:", socket.id);
     });
   });
 };
 
-export default setupSocket;
+export { setupSocket, io };
