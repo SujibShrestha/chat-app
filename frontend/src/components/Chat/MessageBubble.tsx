@@ -39,20 +39,20 @@ const MessageBubble = ({ chat }: { chat: IChat | null }) => {
   }, [messages]);
 
   useEffect(() => {
-  if (!chat) return;
+    if (!chat) return;
 
-  socket.emit("join-chat", chat._id);
+    socket.emit("join-chat", chat._id);
 
- const handleMessageReceived = (newMsg:IMessage) => {
-    if (newMsg.chat._id === chat._id) {
-      setMessages((prev) => [...prev, newMsg]);
-    }
-  };
-socket.on("message-received", handleMessageReceived);
-  return () => {
-    socket.off("message-received",handleMessageReceived);
-  };
-}, [chat]);
+    const handleMessageReceived = (newMsg: IMessage) => {
+      if (newMsg.chat._id === chat._id) {
+        setMessages((prev) => [...prev, newMsg]);
+      }
+    };
+    socket.on("message-received", handleMessageReceived);
+    return () => {
+      socket.off("message-received", handleMessageReceived);
+    };
+  }, [chat]);
 
   const handleSend = async () => {
     if (!newMessage.trim() || !user || !chat) return;
@@ -61,21 +61,21 @@ socket.on("message-received", handleMessageReceived);
       content: newMessage,
       chatId: chat._id,
     });
- socket.emit("new-message", res.data);
+    socket.emit("new-message", res.data);
     setMessages((prev) => [...prev, res.data]);
     setNewMessage("");
   };
 
   if (!chat) {
     return (
-      <div className="flex items-center justify-center w-[80vw] text-gray-500 h-full">
+      <div className="flex items-center  justify-center w-full min-h-[90vh] text-gray-500 h-full">
         Select a chat to start messaging
       </div>
     );
   }
 
   return (
-    <section className="my-4 p-4 w-full h-full flex flex-col">
+    <section className=" w-full  min-h-[85vh] bg-white m-3 flex flex-col rounded-lg">
       {/* Messages container */}
       <div className="flex-1 overflow-y-auto w-full">
         {loading && (
@@ -83,54 +83,63 @@ socket.on("message-received", handleMessageReceived);
             <Spinner className="w-7 h-7" />
           </div>
         )}
+     <div className="w-full flex justify-center font-mono mb-8 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold text-2xl p-5 rounded-xl shadow-lg tracking-wide">
+  {chat.chatName}
+</div>
 
-        {messages.map((msg,index) => (
+<div className="mx-8 max-sm:mx-3">
+        {messages.map((msg, index) => (
           <div
             key={index}
             className={`chat ${
               msg.sender?._id === user?._id ? "chat-end" : "chat-start"
             }`}
           >
-            <div className="chat-header flex justify-between gap-2">
+<div
+              className={`chat-bubble ${
+                msg.sender?._id === user?._id
+                  ? "bg-emerald-500 text-white"
+                  : "bg-gray-200 text-black"
+              }`}
+            >
+            <div className="chat-header font-semibold flex justify-between gap-2">
               {msg.sender?.name}
-              <time className="text-xs opacity-50">
+              
+            </div>
+            
+              {msg.content}
+              <div className="flex  justify-end"><time className=" chat-header opacity-50">
                 {new Date(msg.updatedAt).toLocaleTimeString([], {
                   hour: "2-digit",
                   minute: "2-digit",
                 })}
-              </time>
-            </div>
-            <div
-              className={`chat-bubble ${
-                msg.sender?._id === user?._id
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-black"
-              }`}
-            >
-              {msg.content}
+              </time></div>
             </div>
           </div>
         ))}
         <div ref={messagesEndRef} />
+        </div>
       </div>
 
       {/* Input */}
-      <div className="flex justify-center items-center gap-2 mt-5">
-        <input
-          type="text"
-          placeholder="Type a message..."
-          className="w-full p-2 border border-gray-500 outline-none rounded-lg"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-        />
-        <button
-          onClick={handleSend}
-          className="bg-green-500 hover:bg-green-800 cursor-pointer px-4 py-2 rounded-lg"
-        >
-          Send
-        </button>
-      </div>
+     <div className="flex mx-9 mb-3 justify-center items-center gap-3 mt-5">
+  <input
+    type="text"
+    placeholder="Type a message..."
+    className="w-full p-3 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 placeholder-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition"
+    value={newMessage}
+    onChange={(e) => setNewMessage(e.target.value)}
+    onKeyDown={(e) => e.key === "Enter" && handleSend()}
+  />
+
+  <button
+    onClick={handleSend}
+    className="px-5 py-3 rounded-xl bg-emerald-500 text-white font-medium hover:bg-emerald-600 active:scale-95 shadow-md transition"
+  >
+    Send
+  </button>
+</div>
+
     </section>
   );
 };

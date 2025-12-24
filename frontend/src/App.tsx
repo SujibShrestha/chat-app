@@ -1,10 +1,10 @@
 import "./App.css";
-import AuthProvider from "./context/AuthContext";
+
 
 import Chat from "./pages/Chat";
 
 function App() {
-  return <Chat />;
+  return <div className=" bg-[#F0F3F5] min-h-screen overflow-hidden"><Chat /></div>;
 }
 
 export default App;

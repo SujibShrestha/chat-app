@@ -21,9 +21,10 @@ const accessChat = async (req: AuthRequest, res: Response) => {
   if (chat) {
     return res.json(chat);
   }
-
+ const recipient = await User.findById(userId)
+ if(!recipient) return;
   const newChat = await Chat.create({
-    chatName: "sender",
+    chatName: recipient.name,
     isGroupChat: false,
     users: [req.user._id, userId],
   });
