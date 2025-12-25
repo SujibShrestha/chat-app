@@ -1,10 +1,10 @@
   import mongoose, { Schema } from "mongoose";
-import type { IUser } from "./user.model.js";
+import type { Document, Types } from "mongoose";
 
-export interface IChat {
+export interface IChat extends Document{
   chatName: string;
   isGroupChat: boolean;
-  users: IUser[];
+  users: Types.ObjectId[];
   latestMessage?: string;
 }
 

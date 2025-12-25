@@ -16,10 +16,8 @@ const ChatList = ({
   const [chats, setChats] = useState<IChat[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [debouncevalue] = useDebounce(search, 8000);
+  const [debouncevalue] = useDebounce(search, 800);
   const [sidebar,setSidebar] = useState(true)
-
-
   const handleSidebar= ()=>{
     setSidebar(!sidebar)
   }
@@ -49,12 +47,11 @@ const ChatList = ({
     onselectChat(res.data);
     setSearch("");
   };
-
   return (
 
     
 <aside
-  className={`min-h-[85vh] max-sm:mt-25 mt-3 z-10  rounded-lg  p-4
+  className={`min-h-[85vh] max-sm:mt-26 mt-3 z-10  rounded-lg  p-4
     bg-white font-mono
     transition-all duration-300
     ${sidebar ? "w-70 md:w-70" : "w-16 md:w-15 max-sm:bg-transparent "} 
@@ -63,7 +60,7 @@ const ChatList = ({
   {/* Header with toggle */}
   <div className="flex justify-between items-center mb-4">
   {sidebar?(  <p className="font-bold text-2xl font-mono">Chats</p>):""}
-    <label className="btn btn-circle swap swap-rotate w-8 h-8">
+    <label className="btn btn-circle swap swap-rotate w-8 h-8 max-sm:ml-1">
       <input type="checkbox" onClick={handleSidebar} />
 
       {/* hamburger icon */}
@@ -98,7 +95,7 @@ const ChatList = ({
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Enter user ID"
+          placeholder="Enter name"
           className="flex-1 min-w-0 border rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
         <button
@@ -110,18 +107,31 @@ const ChatList = ({
       </div>
 
       {/* Chat List */}
-      <div className="flex flex-col gap-2 overflow-y-auto max-h-[calc(100vh-200px)]">
+      <div className="flex border-b flex-col gap-2 overflow-y-auto max-h-[calc(100vh-200px)]">
         {chats.map((chat) => (
+          
           <div
             key={chat._id}
             onClick={() => onselectChat(chat)}
             className="cursor-pointer p-3 rounded-lg hover:bg-gray-200 transition-colors truncate"
           >
-            {sidebar ? (!chat.isGroupChat ? chat.chatName : "Direct Chat") : (
-              <span className="text-xs text-black truncate">
-                {chat.isGroupChat ? chat.chatName : "D"}
-              </span>
-            )}
+          {sidebar ? (
+  chat.isGroupChat ? (
+    chat.chatName
+  ) : (
+    chat.users
+      .filter((u) => u._id !== user?._id)[0]?.name || "Direct Chat"
+  )
+) : (
+  <span className="text-xs text-black truncate">
+    {chat.isGroupChat
+      ? chat.chatName?.charAt(0)
+      : chat.users
+          .filter((u) => u._id !== user?._id)[0]
+          ?.name?.charAt(0) || "D"}
+  </span>
+)}
+
           </div>
         ))}
       </div>

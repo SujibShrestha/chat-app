@@ -30,10 +30,10 @@ const sendMessage = (
   });
 };
 
-const createChat = (token: string, userId: string) => {
+const createChat = (token: string, name: string) => {
   return API.post(
     "/chat",
-    {  userId },
+    {  name },
     { headers: { Authorization: `Bearer ${token}` } }
   );
 };

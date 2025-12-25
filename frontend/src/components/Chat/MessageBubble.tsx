@@ -62,10 +62,9 @@ const MessageBubble = ({ chat }: { chat: IChat | null }) => {
       chatId: chat._id,
     });
     socket.emit("new-message", res.data);
-    setMessages((prev) => [...prev, res.data]);
+    
     setNewMessage("");
   };
-
   if (!chat) {
     return (
       <div className="flex items-center  justify-center w-full min-h-[90vh] text-gray-500 h-full">
@@ -83,8 +82,8 @@ const MessageBubble = ({ chat }: { chat: IChat | null }) => {
             <Spinner className="w-7 h-7" />
           </div>
         )}
-     <div className="w-full flex justify-center font-mono mb-8 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold text-2xl p-5 rounded-xl shadow-lg tracking-wide">
-  {chat.chatName}
+     <div className="w-full flex justify-center font-mono mb-8 gradient  text-white font-semibold text-2xl p-5 rounded-xl shadow-lg tracking-wide">
+  {messages[0]?.sender.name}
 </div>
 
 <div className="mx-8 max-sm:mx-3">
@@ -103,7 +102,7 @@ const MessageBubble = ({ chat }: { chat: IChat | null }) => {
               }`}
             >
             <div className="chat-header font-semibold flex justify-between gap-2">
-              {msg.sender?.name}
+              {msg.sender.name}
               
             </div>
             
