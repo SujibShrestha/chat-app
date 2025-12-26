@@ -4,6 +4,7 @@ import type { IMessage, IChat } from "@/types";
 import { useState, useEffect, useContext, useRef } from "react";
 import { Spinner } from "../ui/spinner";
 import socket from "../../socket";
+import Avatar from "../ui/Avatar";
 
 const MessageBubble = ({ chat }: { chat: IChat | null }) => {
   const { user } = useContext(AuthContext);
@@ -62,7 +63,7 @@ const MessageBubble = ({ chat }: { chat: IChat | null }) => {
       chatId: chat._id,
     });
     socket.emit("new-message", res.data);
-    
+
     setNewMessage("");
   };
   if (!chat) {
@@ -82,63 +83,75 @@ const MessageBubble = ({ chat }: { chat: IChat | null }) => {
             <Spinner className="w-7 h-7" />
           </div>
         )}
-     <div className="w-full flex justify-center font-mono mb-8 gradient  text-white font-semibold text-2xl p-5 rounded-xl shadow-lg tracking-wide">
-  {messages[0]?.sender.name}
+        <div className="w-full flex justify-center font-mono mb-8 gradient  text-white font-semibold text-2xl p-5 rounded-xl shadow-lg tracking-wide">
+          {messages[0]?.sender.name}
+        </div>
+
+        <div className="mx-8 max-sm:mx-3">
+  {messages.map((msg, index) => (
+    <div
+      key={index}
+      className={`chat ${msg.sender?._id === user?._id ? "chat-end" : "chat-start"}`}
+    >
+      <div className="flex items-center gap-2">
+        {/* Avatar */}
+        {  msg.sender?._id !== user?._id?(
+        <Avatar
+          className="w-10 h-10 rounded-full object-cover"
+          user={
+            msg.sender?._id === user?._id
+              ? user?.avatar
+              : chat.users.find((u) => u._id !== user?._id)?.avatar
+          }
+        />):""}
+
+        <div
+          className={`chat-bubble ${
+            msg.sender?._id === user?._id
+              ? "bg-emerald-500 text-white"
+              : "bg-gray-200 text-black"
+          }`}
+        >
+          <div className="chat-header font-semibold flex justify-between gap-2">
+            {msg.sender.name}
+          </div>
+
+          {msg.content}
+          <div className="flex justify-end">
+            <time className="chat-header opacity-50">
+              {new Date(msg.updatedAt).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </time>
+          </div>
+        </div>
+      </div>
+    </div>
+  ))}
+  <div ref={messagesEndRef} />
 </div>
 
-<div className="mx-8 max-sm:mx-3">
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`chat ${
-              msg.sender?._id === user?._id ? "chat-end" : "chat-start"
-            }`}
-          >
-<div
-              className={`chat-bubble ${
-                msg.sender?._id === user?._id
-                  ? "bg-emerald-500 text-white"
-                  : "bg-gray-200 text-black"
-              }`}
-            >
-            <div className="chat-header font-semibold flex justify-between gap-2">
-              {msg.sender.name}
-              
-            </div>
-            
-              {msg.content}
-              <div className="flex  justify-end"><time className=" chat-header opacity-50">
-                {new Date(msg.updatedAt).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </time></div>
-            </div>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
-        </div>
       </div>
 
       {/* Input */}
-     <div className="flex mx-9 mb-3 justify-center items-center gap-3 mt-5">
-  <input
-    type="text"
-    placeholder="Type a message..."
-    className="w-full p-3 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 placeholder-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition"
-    value={newMessage}
-    onChange={(e) => setNewMessage(e.target.value)}
-    onKeyDown={(e) => e.key === "Enter" && handleSend()}
-  />
+      <div className="flex mx-9 mb-3 justify-center items-center gap-3 mt-5">
+        <input
+          type="text"
+          placeholder="Type a message..."
+          className="w-full p-3 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 placeholder-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSend()}
+        />
 
-  <button
-    onClick={handleSend}
-    className="px-5 py-3 rounded-xl bg-emerald-500 text-white font-medium hover:bg-emerald-600 active:scale-95 shadow-md transition"
-  >
-    Send
-  </button>
-</div>
-
+        <button
+          onClick={handleSend}
+          className="px-5 py-3 rounded-xl bg-emerald-500 text-white font-medium hover:bg-emerald-600 active:scale-95 shadow-md transition"
+        >
+          Send
+        </button>
+      </div>
     </section>
   );
 };

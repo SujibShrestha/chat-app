@@ -6,6 +6,7 @@ import type { AxiosResponse } from "axios";
 import { useDebounce } from "use-debounce";
 
 import { Spinner } from "../ui/spinner";
+import Avatar from "../ui/Avatar";
 
 const ChatList = ({
   onselectChat,
@@ -109,19 +110,25 @@ const ChatList = ({
       {/* Chat List */}
       <div className="flex border-b flex-col gap-2 overflow-y-auto max-h-[calc(100vh-200px)]">
         {chats.map((chat) => (
-          
+          <div  onClick={() => onselectChat(chat)}   key={chat._id} className="flex items-center cursor-pointer p-3 rounded-lg hover:bg-gray-200 transition-colors truncate">
+          <Avatar className={"w-10 h-10"} user={ chat.users
+      .filter((u) => u._id !== user?._id)[0]?.avatar} />
+     
           <div
-            key={chat._id}
-            onClick={() => onselectChat(chat)}
+          
+           
             className="cursor-pointer p-3 rounded-lg hover:bg-gray-200 transition-colors truncate"
           >
-          {sidebar ? (
+          {sidebar ? ( <div >{
   chat.isGroupChat ? (
     chat.chatName
   ) : (
     chat.users
       .filter((u) => u._id !== user?._id)[0]?.name || "Direct Chat"
-  )
+      
+  )}
+  <p className="text-xs text-gray-500">{chat.latestMessage}</p>
+  </div>
 ) : (
   <span className="text-xs text-black truncate">
     {chat.isGroupChat
@@ -130,9 +137,11 @@ const ChatList = ({
           .filter((u) => u._id !== user?._id)[0]
           ?.name?.charAt(0) || "D"}
   </span>
+  
+  
 )}
 
-          </div>
+          </div></div>
         ))}
       </div>
     </div>
