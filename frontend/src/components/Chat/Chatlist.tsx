@@ -7,6 +7,7 @@ import { useDebounce } from "use-debounce";
 
 import { Spinner } from "../ui/spinner";
 import Avatar from "../ui/Avatar";
+import { useNavigate } from "react-router-dom";
 
 const ChatList = ({
   onselectChat,
@@ -18,14 +19,15 @@ const ChatList = ({
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
   const [debouncevalue] = useDebounce(search, 800);
-  const [sidebar,setSidebar] = useState(true)
-  const handleSidebar= ()=>{
-    setSidebar(!sidebar)
-  }
+  const [sidebar, setSidebar] = useState(true);
+  const navigate = useNavigate();
+  const handleSidebar = () => {
+    setSidebar(!sidebar);
+  };
 
   useEffect(() => {
     if (!user) return;
-   const loadChats = async () => {
+    const loadChats = async () => {
       setLoading(true);
       try {
         const res: AxiosResponse = await fetchChat(user.token);
@@ -49,105 +51,125 @@ const ChatList = ({
     setSearch("");
   };
   return (
-
-    
-<aside
-  className={`min-h-[85vh] max-sm:mt-26 mt-3 z-10  rounded-lg  p-4
+    <aside
+      className={`min-h-[85vh] max-sm:mt-26 mt-3 z-10  rounded-lg  p-4
     bg-white font-mono
     transition-all duration-300
     ${sidebar ? "w-70 md:w-70" : "w-16 md:w-15 max-sm:bg-transparent "} 
     fixed md:relative top-0 left-0`}
->
-  {/* Header with toggle */}
-  <div className="flex justify-between items-center mb-4">
-  {sidebar?(  <p className="font-bold text-2xl font-mono">Chats</p>):""}
-    <label className="btn btn-circle swap swap-rotate w-8 h-8 max-sm:ml-1">
-      <input type="checkbox" onClick={handleSidebar} />
+    >
+      {/* Header with toggle */}
+      <div className="flex justify-between items-center mb-4">
+        {sidebar ? <p className="font-bold text-2xl font-mono">Chats</p> : ""}
+        <label className="btn btn-circle swap swap-rotate w-8 h-8 max-sm:ml-1">
+          <input type="checkbox" onClick={handleSidebar} />
 
-      {/* hamburger icon */}
-      <svg
-        className="swap-on fill-current w-5 h-5"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 512 512"
-      >
-        <path d="M64,384H448V341.33H64Zm0-106.67H448V234.67H64ZM64,128v42.67H448V128Z" />
-      </svg>
-
-      {/* close icon */}
-      <svg
-        className="swap-off fill-current w-5 h-5"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 512 512"
-      >
-        <polygon points="400 145.49 366.51 112 256 222.51 145.49 112 112 145.49 222.51 256 112 366.51 145.49 400 256 289.49 366.51 400 400 366.51 289.49 256 400 145.49" />
-      </svg>
-    </label>
-  </div>
-
-  {/* Sidebar content */}
-  {loading ? (
-    <div className="flex justify-center items-center h-full">
-      <Spinner className="w-7 h-7" />
-    </div>
-  ) : (
-    <div className={`space-y-4 ${!sidebar ? "hidden" : ""}`}>
-      {/* Search and New Chat */}
-      <div className="flex gap-2 w-full">
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Enter name"
-          className="flex-1 min-w-0 border rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-        <button
-          onClick={handleCreateChat}
-          className="bg-green-500 hover:bg-green-700 text-white py-2 px-3 rounded-lg transition-colors "
-        >
-          New
-        </button>
-      </div>
-
-      {/* Chat List */}
-      <div className="flex border-b flex-col gap-2 overflow-y-auto max-h-[calc(100vh-200px)]">
-        {chats.map((chat) => (
-          <div  onClick={() => onselectChat(chat)}   key={chat._id} className="flex items-center cursor-pointer p-3 rounded-lg hover:bg-gray-200 transition-colors truncate">
-          <Avatar className={"w-10 h-10"} user={ chat.users
-      .filter((u) => u._id !== user?._id)[0]?.avatar} />
-     
-          <div
-          
-           
-            className="cursor-pointer p-3 rounded-lg hover:bg-gray-200 transition-colors truncate"
+          {/* hamburger icon */}
+          <svg
+            className="swap-on fill-current w-5 h-5"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 512 512"
           >
-          {sidebar ? ( <div >{
-  chat.isGroupChat ? (
-    chat.chatName
-  ) : (
-    chat.users
-      .filter((u) => u._id !== user?._id)[0]?.name || "Direct Chat"
-      
-  )}
-  <p className="text-xs text-gray-500">{chat.latestMessage}</p>
-  </div>
-) : (
-  <span className="text-xs text-black truncate">
-    {chat.isGroupChat
-      ? chat.chatName?.charAt(0)
-      : chat.users
-          .filter((u) => u._id !== user?._id)[0]
-          ?.name?.charAt(0) || "D"}
-  </span>
-  
-  
-)}
+            <path d="M64,384H448V341.33H64Zm0-106.67H448V234.67H64ZM64,128v42.67H448V128Z" />
+          </svg>
 
-          </div></div>
-        ))}
+          {/* close icon */}
+          <svg
+            className="swap-off fill-current w-5 h-5"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 512 512"
+          >
+            <polygon points="400 145.49 366.51 112 256 222.51 145.49 112 112 145.49 222.51 256 112 366.51 145.49 400 256 289.49 366.51 400 400 366.51 289.49 256 400 145.49" />
+          </svg>
+        </label>
       </div>
-    </div>
-  )}
-</aside>
 
+      {/* Sidebar content */}
+      {loading ? (
+        <div className="flex justify-center items-center h-full">
+          <Spinner className="w-7 h-7" />
+        </div>
+      ) : (
+        <div className={`space-y-4 ${!sidebar ? "hidden" : ""}`}>
+          {/* Search and New Chat */}
+          <div className="flex gap-2 w-full">
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Enter name"
+              className="flex-1 min-w-0 border rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+            <button
+              onClick={handleCreateChat}
+              className="bg-green-500 hover:bg-green-700 text-white py-2 px-3 rounded-lg transition-colors "
+            >
+              New
+            </button>
+          </div>
+
+          {/* Chat List */}
+          <div className="flex border-b scroll-smooth flex-col gap-2 overflow-y-auto max-h-[calc(100vh-200px)]">
+            {chats.map((chat) => (
+              <div
+                onClick={() => onselectChat(chat)}
+                key={chat._id}
+                className="flex items-center cursor-pointer p-3 rounded-lg hover:bg-gray-200 transition-colors truncate"
+              >
+                <Avatar
+                  className={"w-10 h-10"}
+                  user={
+                    chat.users.filter((u) => u._id !== user?._id)[0]?.avatar
+                  }
+                />
+
+                <div className="cursor-pointer p-3 rounded-lg hover:bg-gray-200 transition-colors truncate">
+                  {sidebar ? (
+                    <div>
+                      {chat.isGroupChat
+                        ? chat.chatName
+                        : chat.users.filter((u) => u._id !== user?._id)[0]
+                            ?.name || "Direct Chat"}
+                      <p className="text-xs text-gray-500">
+                        {chat.latestMessage}
+                      </p>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-black truncate">
+                      {chat.isGroupChat
+                        ? chat.chatName?.charAt(0)
+                        : chat.users
+                            .filter((u) => u._id !== user?._id)[0]
+                            ?.name?.charAt(0) || "D"}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div
+        className={`${
+          sidebar ? "gradient" : ""
+        } cursor-pointer absolute bottom-0 border-t-2  right-0.5 py-3 px-2  w-full`}
+      >
+        {sidebar ? (
+          <div
+            className="flex items-center justify-around"
+            onClick={() => navigate("/profile")}
+          >
+            <Avatar className={"w-10 h-10"} user={user?.avatar} />
+            <p>{user?.name}</p>
+          </div>
+        ) : (
+          <div className="flex justify-center max-sm:hidden">
+            {" "}
+            <Avatar className={"w-8 h-8"} user={user?.avatar} />
+          </div>
+        )}
+      </div>
+    </aside>
   );
 };
 

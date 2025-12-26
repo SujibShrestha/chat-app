@@ -44,4 +44,14 @@ export const fetchMessages = (token: string, chatId: string) => {
   });
 };
 
-export { registerUser, LoginUser, fetchChat, sendMessage, createChat };
+const updateAvatar = (token: string, formData: FormData) => {
+  return API.patch("/users/avatar", formData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
+
+export { registerUser, LoginUser, fetchChat, sendMessage, createChat ,updateAvatar};

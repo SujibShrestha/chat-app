@@ -3,16 +3,14 @@ interface AvatarProps {
   user: string | undefined;
 }
 
-const Avatar = ({className , user}:AvatarProps) => {
-  
+const Avatar = ({ className, user }: AvatarProps) => {
   return (
-   <div className="avatar">
-  <div className={` rounded-xl ${className}`}>
-    <img src={user} />
-  </div>
-</div>
+    <div className="avatar">
+      <div className={` rounded-xl ${className}`}>
+        <img src={user} alt="avatar" />
+      </div>
+    </div>
+  );
+};
 
-  )
-}
-
-export default Avatar
+export default Avatar;

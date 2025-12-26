@@ -8,6 +8,7 @@ import { RouterProvider } from "react-router/dom";
 import Auth from './components/Auth/Auth.tsx'
 import ProtectedRoute from './components/Auth/ProtectedRoute.tsx'
 import AuthProvider from './context/AuthContext.tsx'
+import Profile from './pages/profile.tsx'
 
 const router = createBrowserRouter([
   {
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
   {
     path: "/auth",
     element: <Auth />,
+  },
+   {
+    path: "/profile",
+    element: <Profile />,
   },
 ]);
 
